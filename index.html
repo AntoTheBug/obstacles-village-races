@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Classifica OCR - Obstacles Village</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #f5f5f5;
+    }
+    h1 {
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+      background: white;
+    }
+    th, td {
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background: #eee;
+    }
+  </style>
+</head>
+<body>
+  <h1>Classifica OCR - Obstacles Village</h1>
+  <div id="gara-info"></div>
+  <table id="classifica">
+    <thead>
+      <tr>
+        <th>Posizione</th>
+        <th>Codice</th>
+        <th>Nome</th>
+        <th>Cognome</th>
+        <th>Tempo</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const sheetId = "1n9Ej3y-A5qYO5L6sBvRmPHH7lAMbVY-Vg8HkLZPQ0N0";
+    const sheetName = "Classifica"; // cambia se rinomini il tab
+    const garaParam = new URLSearchParams(window.location.search).get("gara") || "Week1";
+    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
+
+    document.getElementById("gara-info").innerHTML = `<p style="text-align:center;"><strong>Gara:</strong> ${garaParam}</p>`;
+
+    async function fetchData() {
+      const res = await fetch(url);
+      const text = await res.text();
+      const json = JSON.parse(text.substr(47).slice(0, -2));
+      const rows = json.table.rows.map(r => r.c.map(c => (c ? c.v : "")));
+
+      const filtered = rows
+        .filter(r => r[5] === garaParam)
+        .map(r => ({
+          codice: r[0],
+          nome: r[1],
+          cognome: r[2],
+          tempo: r[3],
+          tempo_ms: parseInt(r[4], 10)
+        }))
+        .sort((a, b) => a.tempo_ms - b.tempo_ms);
+
+      const tbody = document.querySelector("tbody");
+      tbody.innerHTML = "";
+
+      filtered.forEach((corridore, index) => {
+        const row = `<tr>
+          <td>${index + 1}</td>
+          <td>${corridore.codice}</td>
+          <td>${corridore.nome}</td>
+          <td>${corridore.cognome}</td>
+          <td>${corridore.tempo}</td>
+        </tr>`;
+        tbody.insertAdjacentHTML("beforeend", row);
+      });
+    }
+
+    fetchData();
+    setInterval(fetchData, 10000);
+  </script>
+</body>
+</html>
