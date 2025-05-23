@@ -61,13 +61,14 @@
       const rows = json.table.rows.map(r => r.c.map(c => (c ? c.v : "")));
 
       const filtered = rows
-        .filter(r => r[5] === garaParam)
+        .filter(r => r[6] === garaParam)
         .map(r => ({
-          codice: r[0],
+          category: r[0],
           name: r[1],
           surname: r[2],
           time: r[3],
-          tempo_ms: parseInt(r[4], 10)
+          tempo_ms: parseInt(r[4], 10),
+          category_ranking: r[5]
         }))
         .sort((a, b) => a.tempo_ms - b.tempo_ms);
 
@@ -77,10 +78,11 @@
       filtered.forEach((corridore, index) => {
         const row = `<tr>
           <td>${index + 1}</td>
-          <td>${corridore.codice}</td>
           <td>${corridore.name}</td>
           <td>${corridore.surname}</td>
           <td>${corridore.time}</td>
+          <td>${corridore.category}</td>
+          <td>${corridore.category_ranking}</td>
         </tr>`;
         tbody.insertAdjacentHTML("beforeend", row);
       });
