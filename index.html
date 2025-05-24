@@ -64,6 +64,7 @@
     const sheetId = "1-ysE6mtaZm4ulMrdyjsaZwVxB7vbsQTmFVuovvTTK50";
     const sheetName = "Classifica";
     const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
+    const garaParam = new URLSearchParams(window.location.search).get("gara") || "Week1";
 
     async function fetchData() {
       const res = await fetch(url);
