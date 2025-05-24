@@ -23,7 +23,8 @@
         <th>Cognome</th>
         <th>Tempo</th>
         <th>Categoria</th>
-        <th>Posizione Categoria</th>
+        <th>Genere</th>
+        <th>Posizione Categoria/Genere</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -44,33 +45,32 @@
       const rows = json.table.rows.map(r => r.c.map(c => (c ? c.v : "")));
 
       const filtered = rows
-        .filter(r => r[5] === garaParam)
+        .filter(r => r[6] === garaParam)
         .map(r => ({
-          name: r[1],
-          surname: r[2],
-          time: r[3],
-          tempo_ms: parseInt(r[4], 10),
           category: r[0],
+          gender: r[1],
+          name: r[2],
+          surname: r[3],
+          time: r[4],
+          tempo_ms: parseInt(r[5], 10),
         }))
         .sort((a, b) => a.tempo_ms - b.tempo_ms);
 
       const tbody = document.querySelector("tbody");
       tbody.innerHTML = "";
 
-      const categoryRanks = {};
-
-      filtered.forEach((corridore, index) => {
-        if (!categoryRanks[corridore.category]) {
-          categoryRanks[corridore.category] = [];
-        }
-        categoryRanks[corridore.category].push(corridore);
+      // Calcolo della posizione per categoria + sesso
+      const catGenderRanks = {};
+      filtered.forEach(c => {
+        const key = `${c.category}_${c.gender}`;
+        if (!catGenderRanks[key]) catGenderRanks[key] = [];
+        catGenderRanks[key].push(c);
       });
 
-      // calcola posizione nella categoria
-      Object.values(categoryRanks).forEach(lista => {
+      Object.values(catGenderRanks).forEach(lista => {
         lista.sort((a, b) => a.tempo_ms - b.tempo_ms);
         lista.forEach((c, i) => {
-          c.rank = i + 1;
+          c.rank_cat_gender = i + 1;
         });
       });
 
@@ -81,7 +81,8 @@
           <td>${corridore.surname}</td>
           <td>${corridore.time}</td>
           <td>${corridore.category}</td>
-          <td>${corridore.rank}</td>
+          <td>${corridore.gender}</td>
+          <td>${corridore.rank_cat_gender}</td>
         </tr>`;
         tbody.insertAdjacentHTML("beforeend", row);
       });
