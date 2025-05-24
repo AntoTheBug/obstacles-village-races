@@ -65,8 +65,6 @@
     const sheetName = "Classifica";
     const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
 
-    document.getElementById("gara-info").innerHTML = `<p style="text-align:center;"><strong>Gara:</strong> ${garaParam}</p>`;
-
     async function fetchData() {
       const res = await fetch(url);
       const text = await res.text();
