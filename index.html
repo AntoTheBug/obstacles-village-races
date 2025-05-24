@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Classifica OCR - Obstacles Village</title>
+  <title>OCR 100 Leaderboard - Obstacles Village</title>
   <style>
     body {
       font-family: sans-serif;
@@ -43,18 +43,18 @@
   </style>
 </head>
 <body>
-  <h1>Classifica OCR - Obstacles Village</h1>
+  <h1>OCR Race Leaderboard - Obstacles Village</h1>
   <div id="gara-info"></div>
   <table id="classifica">
     <thead>
       <tr>
-        <th>Posizione</th>
-        <th>Nome</th>
-        <th>Cognome</th>
-        <th>Tempo</th>
-        <th>Categoria</th>
-        <th>Genere</th>
-        <th>Posizione Categoria/Genere</th>
+        <th>Position</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Time</th>
+        <th>Category</th>
+        <th>Gender</th>
+        <th>Category/Gender Rank</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -63,8 +63,10 @@
   <script>
     const sheetId = "1-ysE6mtaZm4ulMrdyjsaZwVxB7vbsQTmFVuovvTTK50";
     const sheetName = "Classifica";
-    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
     const garaParam = new URLSearchParams(window.location.search).get("gara") || "Week1";
+    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
+
+    document.getElementById("gara-info").innerHTML = `<p style="text-align:center;"><strong>Race:</strong> ${garaParam}</p>`;
 
     async function fetchData() {
       const res = await fetch(url);
@@ -82,12 +84,12 @@
           time: r[4],
           tempo_ms: parseInt(r[5], 10),
         }))
+        .filter(r => !isNaN(r.tempo_ms))
         .sort((a, b) => a.tempo_ms - b.tempo_ms);
 
       const tbody = document.querySelector("tbody");
       tbody.innerHTML = "";
 
-      // Calcolo della posizione per categoria + sesso
       const catGenderRanks = {};
       filtered.forEach(c => {
         const key = `${c.category}_${c.gender}`;
@@ -110,7 +112,7 @@
           <td>${corridore.time}</td>
           <td>${corridore.category}</td>
           <td>${corridore.gender}</td>
-          <td>${corridore.rank_cat_gender}</td>
+          <td>${corridore.rank_cat_gender || ""}</td>
         </tr>`;
         tbody.insertAdjacentHTML("beforeend", row);
       });
